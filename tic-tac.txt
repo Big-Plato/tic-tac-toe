@@ -1,0 +1,18 @@
+ Possible plays 
+board[0][0], board[0][1], board[0][2]
+board[1][0], board[1][1], board[1][2]
+board[2][0], board[2][1], board[2][2]
+
+Win Patterns
+[0][0]-[0][1]-[0][2] - First row horizontal
+[0][0]-[1][1]-[2][2] - Diagonal
+[0][0]-[1][0]-[2][0] - Left column(first)
+[1][0]-[1][1]-[1][2] - Second row horizontal
+[0][1]-[1][1]-[2][1] - Middle column
+[0][2]-[1][2]-[2][2] - Last column
+[0][2]-[1][1]-[2][0] - Diagonal
+
+How can I make a player drop a mark in the board?
+1 - I have to make an variable for the index of each specific place in the array of board?
+
+2 - I have to check before if this place is available;

@@ -4,15 +4,12 @@
 2 - Create Gameboard
 3 - Playround
 4 - Switch player
-5 - Win...
-    
- Possible plays 
-board[0][0], board[0][1], board[0][2]
-board[1][0], board[0][1], board[0][2]
-board[2][0], board[0][1], board[0][2]
+5 - Print the gameBoard
+6 - Win...
+
 */
 
-function gameBoard () {
+function GameBoard () {
     const [rows, columns] = [3, 3];
 
     console.log(rows)
@@ -27,22 +24,35 @@ function gameBoard () {
         }
     }
     
+    //Method to get the board
     const getBoard = () => board;
-    
-    const dropMark = (row, column) => {
-        const availablePlaces = board.filter((row) => row[column].getValue() === ' ').map(row => row[column]);
-        console.log(availablePlaces)
-        return availablePlaces;
+
+    //Method to drop a mark in the board
+    const dropMark = (row, column, player) => {
+        const availableCells = board.filter((row) => row[column].getValue() === " ");
+        console.log(availableCells);
+
+        if (!availableCells.length) return;
+        // const play = 
     }
 
-    return {getBoard, dropMark}
+    const printBoard = () => {
+        console.log(getBoard())
+    }
+
+    return {getBoard, dropMark, printBoard}
+}
+
+function printGameBoard () {
+    gameBoard();
+    return console.table(board);
 }
 
 function Cell () {
     let value = " ";
 
     const addToken = (player) => {
-        value = player;
+        value = player.marker;
     }
 
     const getValue = () => value;
@@ -53,7 +63,43 @@ function Cell () {
 // Create the function to play round
 function playRound (player1, player2) {
     let play = false;
+
+    const board = gameBoard();
+
+    console.log(board.getBoard())
+    
 } 
+
+function GameController (
+    playerOne = player1,
+    playerTwo = player2
+) {
+    const board = Gameboard();
+
+    const players = [
+        {
+            name: playerOne,
+            token: "X"
+        },
+        {
+            name: playerTwo,
+            token: "O"
+        }
+    ];
+
+    let activePlayer = players[0];
+
+    // Switch turn, if active player is [0] then switch to [1]
+    const switchPlayerTurn = () => {
+        activePlayer = activePlayer === players[0] ? players[1] : players[0];
+    };
+
+    const getActivePlayer = () => activePlayer;
+
+    const printNewRound () => {
+        board.printBoard();
+    }
+}
 
 // Create Player function
 function createPlayer (name, marker) {
