@@ -1,35 +1,63 @@
 
 //function that selects the gameboard and use the other functions to play the game
 function GameBoard () {
-    const cells = document.querySelectorAll(".cell")
+    const cells = document.querySelectorAll(".cell");
 
     board = Array.from(cells);
 
-    board.filter((element) => {
-        console.log(element.dataset.value)
+    const availableCells = board.filter((element) => {
+        element.dataset.value === " " ? console.log("Playable") : -1;
+    })
+    console.log(availableCells)
+
+    playGame();
+
+    board.forEach((e) => {
+        e.addEventListener("click", (dropMark) => {
+            console.log("rs");
+        })
     })
 
     console.log(board)
 
     const getBoard = () => board;
 
-    return {getBoard, board}
+    //Switch the players
+    const switchTurns = () => { 
+        let currentPlayer = playerOne;
+        if (currentPlayer === playerOne) {
+        currentPlayer = playerTwo;
+    } else {
+        currentPlayer = playerOne;
+    }
+
+    let markX = document.createElement("img");
+    markX.textContent = "X";
+    let markO = document.createElement("p");
+    markO.textContent = "O";
+
+    const dropMark = () => {
+        if (currentPlayer === playerOne && playerOne.marker === "X") {
+            
+        }
+    }
+}
+
+
+    return {getBoard, board, switchTurns, dropMark}
 }
 
 // function that got the logic of the game
 function playGame () {
-    const board = GameBoard.getBoard();
-
-    console.log(board)
-}
-
-// function to create a player based on user input
-function gamePlayer () {
     let player = prompt("Put your name")
     let marker = prompt("Put your mark here [X] or [O]");
 
+    let computerMark = marker === "X" ? "O" : "X";
+
     let playerOne = CreatePlayer(player, marker)
-    return playerOne;
+
+    let playerTwo = CreatePlayer("Computer", computerMark)
+
 }
 
 //function to create the player
