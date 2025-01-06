@@ -1,0 +1,39 @@
+body {
+    background-color: black;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 100px 3fr auto;
+    justify-items: center;
+    font-family: "Tourney", serif;
+}
+
+h1 {
+    color: white;
+    padding-bottom: 0;
+    margin-bottom: 0;
+}
+
+h1 span {
+    color: red;
+}
+
+h1 span:last-child {
+    color: green;
+}
+
+#gameContainer {
+    display: grid;
+    width: 400px;
+    height: 400px;
+    background-color: white;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+}
+
+.cell {
+    border: 8px solid black;
+}
+
+#restart {
+    margin-top: 10px;
+}
