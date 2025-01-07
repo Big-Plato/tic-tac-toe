@@ -1,75 +1,111 @@
+function GameBoard() {
+  const [rows, columns] = [3, 3];
+  let board = [];
 
-//function that selects the gameboard and use the other functions to play the game
-function GameBoard () {
-    const cells = document.querySelectorAll(".cell");
-
-    board = Array.from(cells);
-
-    const availableCells = board.filter((element) => {
-        element.dataset.value === " " ? console.log("Playable") : -1;
-    })
-    console.log(availableCells)
-
-    playGame();
-
-    board.forEach((e) => {
-        e.addEventListener("click", (dropMark) => {
-            console.log("rs");
-        })
-    })
-
-    console.log(board)
-
-    const getBoard = () => board;
-
-    //Switch the players
-    const switchTurns = () => { 
-        let currentPlayer = playerOne;
-        if (currentPlayer === playerOne) {
-        currentPlayer = playerTwo;
-    } else {
-        currentPlayer = playerOne;
+  for (let i = 0; i < rows; i++) {
+    board[i] = [];
+    for (let j = 0; j < columns; j++) {
+      board[i].push(Cell());
     }
+  }
 
-    let markX = document.createElement("img");
-    markX.textContent = "X";
-    let markO = document.createElement("p");
-    markO.textContent = "O";
+  console.log(board);
 
-    const dropMark = () => {
-        if (currentPlayer === playerOne && playerOne.marker === "X") {
-            
-        }
-    }
+  const getBoard = () => board;
+
+  const dropMark = (row, column, player) => {
+    const availableCells = board.filter((row) =>
+      row.filter((column) => column.getValue() === " ")
+    );
+
+    console.log(availableCells);
+
+    if (!availableCells.length) return;
+
+    board[row][column].addMark(player);
+  };
+
+  const printBoard = () => {
+    const boardCellsHasValues = board.map((row) =>
+      row.map((cell) => cell.getValue())
+    );
+    console.log(boardCellsHasValues);
+  };
+
+  return { getBoard, dropMark, printBoard };
 }
 
+function Cell() {
+  let value = " ";
 
-    return {getBoard, board, switchTurns, dropMark}
+  const addMark = (player) => {
+    value = player;
+  };
+
+  const getValue = () => value;
+
+  return { addMark, getValue };
 }
 
-// function that got the logic of the game
-function playGame () {
-    let player = prompt("Put your name")
-    let marker = prompt("Put your mark here [X] or [O]");
+function CreatePlayer(name, marker) {
+  this.name = name;
+  this.marker = marker;
 
-    let computerMark = marker === "X" ? "O" : "X";
+  let score = 0;
+  getScore = () => score;
+  giveScore = () => score++;
 
-    let playerOne = CreatePlayer(player, marker)
-
-    let playerTwo = CreatePlayer("Computer", computerMark)
-
+  return { name, marker, getScore, giveScore };
 }
 
-//function to create the player
-function CreatePlayer (name, marker) {
-    this.name = name;
-    this.marker = marker;
+function GameController(playerOne, playerTwo) {
+  const board = GameBoard();
 
-    let score = 0;
+  let playerOneName = prompt("What's your name?");
+  let playerOneMark;
 
-    const getScore = () => score;
-    const giveScore = () => score++;
+  do {
+    playerOneMark = prompt("Do you want to play with X or O?");
+  } while (playerOneMark !== "X" && playerOneMark !== "O");
 
-    return {name, marker, getScore, giveScore}
+  let computerMark;
+  if (playerOneMark === "X" ? (computerMark = "O") : (computerMark = "X"));
+
+  playerOne = CreatePlayer(playerOneName, playerOneMark);
+
+  playerTwo = CreatePlayer("Computer", computerMark);
+
+  const players = [playerOne, playerTwo];
+
+  console.log(players);
+
+  let activePlayer = players[0];
+
+  const switchPlayerTurn = () => {
+    activePlayer = activePlayer === players[0] ? players[1] : players[0];
+  };
+  const getActivePlayer = () => activePlayer;
+
+  const printNewRound = () => {
+    board.printBoard();
+    console.log(`${getActivePlayer().name}'s turn.`);
+  };
+
+  const playRound = (row, column) => {
+    console.log(
+      `Putting ${
+        getActivePlayer().name
+      }'s mark into row ${row} column ${column}.`
+    );
+    board.dropMark(row, column, getActivePlayer().marker);
+
+    switchPlayerTurn();
+    printNewRound();
+  };
+
+  printNewRound();
+
+  return { playRound, getActivePlayer };
 }
 
+const game = GameController();
