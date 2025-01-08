@@ -90,8 +90,6 @@ function GameController(playerOne, playerTwo) {
   };
 
   const playRound = (column, row) => {
-    const boardIndex = board.getBoard();
-
     if (activePlayer === players[0]) {
       console.log(
         `Putting ${
@@ -163,10 +161,10 @@ function ScreenController() {
   const game = GameController();
   const gameContainer = document.querySelector("#gameContainer");
   const turnPlayer = document.querySelector("#playerTurn");
-  const restartBtn = document.querySelector("#restart");
+  
 
   const updateScreen = () => {
-    turnPlayer.textContent = "";
+    gameContainer.textContent = "";
 
     const board = game.getBoard();
     const activePlayer = game.getActivePlayer();
@@ -182,6 +180,7 @@ function ScreenController() {
         cellBtn.dataset.column = column;
         console.log(cellBtn.dataset.column)
         cellBtn.textContent = cell.getValue();
+        cellBtn.textContent.cssText = "font-size: 2rem;"
         gameContainer.appendChild(cellBtn);
       });
     });
@@ -190,7 +189,7 @@ function ScreenController() {
   function clickBoard(e) {
     const selectedColumn = e.target.dataset.column;
     const selectedRow = e.target.dataset.row;
-    if (!selectedColumn && !selectedRow) return;
+    // if (!selectedColumn && !selectedRow) return;
 
     game.playRound(selectedColumn, selectedRow);
     updateScreen();
@@ -198,6 +197,11 @@ function ScreenController() {
   gameContainer.addEventListener("click", clickBoard);
 
   updateScreen();
+
+  
 }
 
 ScreenController();
+
+const restartBtn = document.querySelector("#restart");
+restartBtn.addEventListener("click", ScreenController);
