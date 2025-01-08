@@ -18,13 +18,7 @@ function GameBoard() {
       .map((row) => row[column]);
     if (!availableCells.length) return;
 
-    // const availablePlaces = board.map((row) => row.map((cell) => cell.getValue()));
-    // if (availablePlaces[row][column] !== "") {
-    //     console.log("Not a valid play. Put it another");
-    //     console.log(availablePlaces[row][column]);
-    // } else {
     board[row][column].addMark(player);
-    //     }
   };
 
   const printBoard = () => {
@@ -67,7 +61,7 @@ function GameController(playerOne, playerTwo) {
   let playerOneMark;
 
   do {
-    playerOneMark = prompt("Do you want to play with X or O?");
+    playerOneMark = prompt("Do you want to play with X or O?").toUpperCase();
   } while (playerOneMark !== "X" && playerOneMark !== "O");
 
   let computerMark;
@@ -124,13 +118,54 @@ function GameController(playerOne, playerTwo) {
       }
     }
 
-    switchPlayerTurn();
+    const checkWin = () => {
+        const boardIndex = board.getBoard();
+        const Check = boardIndex.map((row) =>
+            row.map((cell) => cell.getValue()));
+
+        // Horizontal
+        for (let i = 0; i < Check.length; i++) {
+            if (Check[i][0] && Check[i][1] && Check[i][2]) {
+                console.log(`${getActivePlayer().name} wins.`)
+                return 1;
+            }
+        }
+
+        // Vertical
+        for (let i = 0; i < Check.length; i++) {
+            if (Check[0][i] && Check[1][i] && Check[2][i]) {
+                console.log(`${getActivePlayer().name} wins.`)
+                return 1;
+            }
+        }
+
+        // Diagonal to bottom-right
+        for (let i = 0; i < Check.length; i++) {
+            if (Check[0][i] && Check[1][i + 1] && Check[2][i + 2]) {
+                console.log(`${getActivePlayer().name} wins.`)
+                return 1;
+            }
+        }
+
+        // Diagonal to upper-left
+        for (let i = 0; i < Check.length; i++) {
+            if (Check[0][i + 2] && Check[1][i + 1] && Check[2][i]) {
+                console.log(`${getActivePlayer().name} wins.`)
+                return 1;
+            }
+        }
+    }
+
+    
     printNewRound();
+    checkWin();
+    switchPlayerTurn();
+
   };
 
   printNewRound();
 
-  return { playRound, getActivePlayer };
+  return { playRound, getActivePlayer, checkWin };
 }
 
 const game = GameController();
