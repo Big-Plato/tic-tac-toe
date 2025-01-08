@@ -37,3 +37,13 @@ h1 span:last-child {
 #restart {
     margin-top: 10px;
 }
+
+.para {
+    line-height: 110px;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    font-weight: bolder;
+    font-size: 5rem;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
