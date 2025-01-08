@@ -1,7 +1,8 @@
 
 function GameBoard () {
     
-    const [rows, columns] = [3, 3];
+    const rows = 3;
+    const columns = 3;
     let board = [];
 
     for (let i = 0; i < rows; i++) {
@@ -11,18 +12,20 @@ function GameBoard () {
         }
     } 
 
-    console.log(board)
-
     const getBoard = () => board;
-
+    
     const dropMark = (row, column, player) => {
-        const availableCells = board.filter((row) => row.filter((column) => column.getValue() === " "));
-
+        const availableCells = board.filter((row) => row[column].getValue() === "");
         console.log(availableCells)
-
+        let boardIndex = board[row][column];
         if (!availableCells.length) return;
 
-        board[row][column].addMark(player);
+        if (boardIndex.getValue() !== "") {
+            console.log(boardIndex.getValue())
+            console.log("Not a valid play. Put it again");
+        } else {
+            board[row][column].addMark(player);
+        }      
     };
 
     const printBoard = () => {
@@ -34,7 +37,7 @@ function GameBoard () {
 }
 
  function Cell () {
-    let value = " ";
+    let value = "";
 
     const addMark = (player) => {
         value = player;
@@ -78,8 +81,6 @@ function GameController (playerOne, playerTwo) {
 
     const board = GameBoard();
 
-    console.log(players);
-
     let activePlayer = players[0];
 
     const switchPlayerTurn = () => {
@@ -92,23 +93,29 @@ function GameController (playerOne, playerTwo) {
         console.log(`${getActivePlayer().name}'s turn.`)
     };
 
-    console.log(players[0])
-
     const playRound = (row, column) => {
-        
+
+                const boardIndex = board.getBoard();
+
                 if(activePlayer === players[0]) {
-                    console.log(`Putting ${getActivePlayer().name}'s mark into row ${row} column ${column}.`);
-                    board.dropMark(row, column, getActivePlayer().marker);
-                }
+                    if (boardIndex[row][column].getValue() !== '') {
+                        console.log("Put another value!");
+                        return;
+                    } else {
+                        console.log(`Putting ${getActivePlayer().name}'s mark into row ${row} column ${column}.`);
+                        board.dropMark(row, column, getActivePlayer().marker); 
+                    }
+                    board.dropMark(row, column, getActivePlayer().marker); 
+                }                          
+                
                 if (activePlayer === players[1]) {
                     row = Math.floor(Math.random() * 2);
                     column = Math.floor(Math.random() * 2)
                     console.log(`${getActivePlayer().name} is making a move into ${row} column ${column}.`)
-                    // do {
-                        board.dropMark(row, column, getActivePlayer().marker);
-                    // } while(board.dropMark)
-                    
+                    board.dropMark(row, column, getActivePlayer().marker);
                 }
+
+
                switchPlayerTurn();
                 printNewRound(); 
                      
