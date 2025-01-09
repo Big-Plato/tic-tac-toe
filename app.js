@@ -12,9 +12,8 @@ function GameBoard() {
 
   const getBoard = () => board;
 
-  const dropMark = (column, row, player) => {
+  const dropMark = (row, column, player) => {
     console.log("row:", row, "column:", column)
-    console.log(board[row][column]);
     const availableCells = board
       .filter((row, column) => row[column].getValue() === "")
       .map((row) => row[column]);
@@ -59,19 +58,20 @@ function CreatePlayer(name, marker) {
 function checkWin() {}
 
 function GameController(playerOne, playerTwo) {
-  let playerOneName = prompt("What's your name?");
+  let playerOneName = prompt("What's your name? [Player 1]");
   let playerOneMark;
 
   do {
     playerOneMark = prompt("Do you want to play with X or O?").toUpperCase();
   } while (playerOneMark !== "X" && playerOneMark !== "O");
 
-  let computerMark;
-  if (playerOneMark === "X" ? (computerMark = "O") : (computerMark = "X"));
+  let playerTwoName = prompt("What's your name? [Player 2]")
+  let playerTwoMark;
+  if (playerOneMark === "X" ? (playerTwoMark = "O") : (playerTwoMark = "X"));
 
   playerOne = CreatePlayer(playerOneName, playerOneMark);
 
-  playerTwo = CreatePlayer("Computer", computerMark);
+  playerTwo = CreatePlayer(playerTwoName, playerTwoMark);
 
   const players = [playerOne, playerTwo];
 
@@ -89,63 +89,80 @@ function GameController(playerOne, playerTwo) {
     console.log(`${getActivePlayer().name}'s turn.`);
   };
 
-  const playRound = (column, row) => {
+  const playRound = (row, column) => {
+
+    const boardIndex = board.getBoard();
+    boardIndex.forEach((e) => {
+      e.forEach((square) => {
+        console.log(square.getValue())
+      });
+    });
     if (activePlayer === players[0]) {
-      console.log(
-        `Putting ${
-          getActivePlayer().name
-        }'s mark into row ${row} column ${column}.`
-      );
-      board.dropMark(column, row, getActivePlayer().marker);
-    }
+        if (boardIndex[row][column].getValue() !== "") {
+            console.log("Invalid Cell");
+        } else {
+            console.log(
+                `Putting ${
+                  getActivePlayer().name
+                }'s mark into row ${row} column ${column}.`
+              );
+              board.dropMark(row, column, getActivePlayer().marker);
+            }
+        }
 
     if (activePlayer === players[1]) {
-      row = Math.floor(Math.random() * 2);
-      column = Math.floor(Math.random() * 2);
-      console.log(
-        `Putting ${
-          getActivePlayer().name
-        }'s mark into row ${row} column ${column}.`
-      );
-      board.dropMark(row, column, getActivePlayer().marker);
-    }
+        if (boardIndex[row][column].getValue() !== "") {
+            console.log("Invalid Cell");
+            return;
+        } else {
+            console.log(
+              `Putting ${
+                getActivePlayer().name
+              }'s mark into row ${row} column ${column}.`
+            );
+            board.dropMark(row, column, getActivePlayer().marker);
+          }
+        }
+     
 
-    const checkWin = () => {
+      function checkWin (getActivePlayer) {
       const boardIndex = board.getBoard();
-      const Check = boardIndex.map((row) => row.map((cell) => cell.getValue()));
+      const Checked = boardIndex.map((row) => row.map((cell) => cell.getValue()));
+      let winner = getActivePlayer().name;
 
       // Horizontal
-      for (let i = 0; i < Check.length; i++) {
-        if (Check[i][0] && Check[i][1] && Check[i][2]) {
-          console.log(`${getActivePlayer().name} wins.`);
-          return 1;
+      
+        for (let i = 0; i < Checked.length; i++) {
+          if (Checked[i][0] && Checked[i][1] && Checked[i][2]) {
+            console.log(`${getActivePlayer().name} wins.`);
+            return winner;
+          }
+        }
+  
+        // Vertical
+        for (let i = 0; i < Checked.length; i++) {
+          if (Checked[0][i] && Checked[1][i] && Checked[2][i]) {
+            console.log(`${getActivePlayer().name} wins.`);
+            return winner;
+          }
+        }
+  
+        // Diagonal to bottom-right
+        for (let i = 0; i < Checked.length; i++) {
+          if (Checked[0][i] && Checked[1][i + 1] && Checked[2][i + 2]) {
+            console.log(`${getActivePlayer().name} wins.`);
+            return winner;
+          }
+        }
+  
+        // Diagonal to upper-left
+        for (let i = 0; i < Checked.length; i++) {
+          if (Checked[0][i + 2] && Checked[1][i + 1] && Checked[2][i]) {
+            console.log(`${getActivePlayer().name} wins.`);
+            return winner;
+          }
         }
       }
-
-      // Vertical
-      for (let i = 0; i < Check.length; i++) {
-        if (Check[0][i] && Check[1][i] && Check[2][i]) {
-          console.log(`${getActivePlayer().name} wins.`);
-          return 1;
-        }
-      }
-
-      // Diagonal to bottom-right
-      for (let i = 0; i < Check.length; i++) {
-        if (Check[0][i] && Check[1][i + 1] && Check[2][i + 2]) {
-          console.log(`${getActivePlayer().name} wins.`);
-          return 1;
-        }
-      }
-
-      // Diagonal to upper-left
-      for (let i = 0; i < Check.length; i++) {
-        if (Check[0][i + 2] && Check[1][i + 1] && Check[2][i]) {
-          console.log(`${getActivePlayer().name} wins.`);
-          return 1;
-        }
-      }
-    };
 
     printNewRound();
     checkWin();
@@ -154,7 +171,7 @@ function GameController(playerOne, playerTwo) {
 
   printNewRound();
 
-  return { playRound, getActivePlayer, getBoard: board.getBoard };
+  return { playRound, getActivePlayer, checkWin, getBoard: board.getBoard };
 }
 
 function ScreenController() {
@@ -176,11 +193,10 @@ function ScreenController() {
         const cellBtn = document.createElement("button");
         cellBtn.classList.add("cell");
         cellBtn.dataset.row = i;
-        console.log(cellBtn.dataset.row)
         cellBtn.dataset.column = column;
-        console.log(cellBtn.dataset.column)
+        cellBtn.dataset.value = "";
         cellBtn.textContent = cell.getValue();
-        cellBtn.textContent.cssText = "font-size: 2rem;"
+        cellBtn.classList.add = ".cellMate"
         gameContainer.appendChild(cellBtn);
       });
     });
@@ -189,16 +205,18 @@ function ScreenController() {
   function clickBoard(e) {
     const selectedColumn = e.target.dataset.column;
     const selectedRow = e.target.dataset.row;
-    // if (!selectedColumn && !selectedRow) return;
+    console.log("row:", selectedRow, "column: ", selectedColumn)
+    if (!selectedColumn && !selectedRow) return;
 
-    game.playRound(selectedColumn, selectedRow);
+
+    game.playRound(selectedRow, selectedColumn);
     updateScreen();
+    Check();
   }
   gameContainer.addEventListener("click", clickBoard);
 
   updateScreen();
 
-  
 }
 
 ScreenController();
