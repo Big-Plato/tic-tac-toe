@@ -1,4 +1,48 @@
-import GameBoard from "../modules/gameboard";
+function GameBoard() {
+  const rows = 3;
+  const columns = 3;
+  let board = [];
+
+  for (let i = 0; i < rows; i++) {
+    board[i] = [];
+    for (let j = 0; j < columns; j++) {
+      board[i].push(Cell());
+    }
+  }
+
+  const getBoard = () => board;
+
+  const dropMark = (row, column, player) => {
+    console.log("row:", row, "column:", column);
+    const availableCells = board
+      .filter((row, column) => row[column].getValue() === "")
+      .map((row) => row[column]);
+    // if (!availableCells.length) return;
+
+    board[row][column].addMark(player);
+  };
+
+  const printBoard = () => {
+    const boardCellsHasValues = board.map((row) =>
+      row.map((cell) => cell.getValue())
+    );
+    console.table(boardCellsHasValues);
+  };
+
+  return { getBoard, dropMark, printBoard };
+}
+
+function Cell() {
+  let value = "";
+
+  const addMark = (player) => {
+    value = player;
+  };
+
+  const getValue = () => value;
+
+  return { addMark, getValue };
+}
 
 function CreatePlayer(name, marker) {
   this.name = name;
@@ -10,6 +54,8 @@ function CreatePlayer(name, marker) {
 
   return { name, marker, getScore, giveScore };
 }
+
+function checkWin() {}
 
 function GameController(playerOne, playerTwo) {
   let playerOneName = prompt("What's your name? [Player 1]");
@@ -51,66 +97,69 @@ function GameController(playerOne, playerTwo) {
       });
     });
     if (activePlayer === players[0]) {
-      if (boardIndex[row][column].getValue() !== "") {
-        console.log("Invalid Cell");
-      } else {
-        console.log(
-          `Putting ${
-            getActivePlayer().name
-          }'s mark into row ${row} column ${column}.`
-        );
-        board.dropMark(row, column, getActivePlayer().marker);
-      }
+      console.log(
+        `Putting ${
+          getActivePlayer().name
+        }'s mark into row ${row} column ${column}.`
+      );
+      board.dropMark(row, column, getActivePlayer().marker);
     }
 
     if (activePlayer === players[1]) {
-      if (boardIndex[row][column].getValue() !== "") {
-        console.log("Invalid Cell");
-        return;
-      } else {
-        console.log(
-          `Putting ${
-            getActivePlayer().name
-          }'s mark into row ${row} column ${column}.`
-        );
-        board.dropMark(row, column, getActivePlayer().marker);
-      }
+      console.log(
+        `Putting ${
+          getActivePlayer().name
+        }'s mark into row ${row} column ${column}.`
+      );
+      board.dropMark(row, column, getActivePlayer().marker);
     }
 
-    function checkWin(board) {
+    function checkWin(labions) {
       const boardIndex = board.getBoard();
       const Checked = boardIndex.map((row) =>
         row.map((cell) => cell.getValue())
       );
 
+      labions = false;
+
       // Horizontal
-
-      for (let i = 0; i < Checked.length; i++) {
-        if (Checked[i][0] && Checked[i][1] && Checked[i][2]) {
-          return true;
+      for (let j = 0; j < boardIndex.length; j++) {
+        for (let i = 0; i < Checked.length; i++) {
+          if (Checked[i][0] && Checked[i][1] && Checked[i][2]) {
+            labions = true;
+            console.log(`${getActivePlayer().name} wins.`)
+            return labions;
+          }
+        }
+  
+        // Vertical
+        for (let i = 0; i < Checked.length; i++) {
+          if (Checked[0][i] && Checked[1][i] && Checked[2][i]) {
+            labions = true
+            console.log(`${getActivePlayer().name} wins.`)            
+            return labions;
+          }
+        }
+  
+        // Diagonal to bottom-right
+        for (let i = 0; i < Checked.length; i++) {
+          if (Checked[0][i] && Checked[1][i + 1] && Checked[2][i + 2]) {
+            labions = true;
+            console.log(`${getActivePlayer().name} wins.`)
+            return labions;
+          }
+        }
+  
+        // Diagonal to upper-left
+        for (let i = 0; i < Checked.length; i++) {
+          if (Checked[0][i + 2] && Checked[1][i + 1] && Checked[2][i]) {
+            labions = true;
+            console.log(`${getActivePlayer().name} wins.`)
+            return labions;
+          }
         }
       }
-
-      // Vertical
-      for (let i = 0; i < Checked.length; i++) {
-        if (Checked[0][i] && Checked[1][i] && Checked[2][i]) {
-          return true;
-        }
-      }
-
-      // Diagonal to bottom-right
-      for (let i = 0; i < Checked.length; i++) {
-        if (Checked[0][i] && Checked[1][i + 1] && Checked[2][i + 2]) {
-          return true;
-        }
-      }
-
-      // Diagonal to upper-left
-      for (let i = 0; i < Checked.length; i++) {
-        if (Checked[0][i + 2] && Checked[1][i + 1] && Checked[2][i]) {
-          return true;
-        }
-      }
+      
     }
 
     printNewRound();
@@ -136,11 +185,11 @@ function ScreenController() {
 
     turnPlayer.textContent = `${activePlayer.name}'s turn...`;
 
-    board.forEach((row, i) => {
-      row.forEach((cell, column) => {
+    board.forEach((rows, row) => {
+      rows.forEach((cell, column) => {
         const cellBtn = document.createElement("button");
         cellBtn.classList.add("cell");
-        cellBtn.dataset.row = i;
+        cellBtn.dataset.row = row;
         cellBtn.dataset.column = column;
         cellBtn.dataset.value = cell.getValue();
         cellBtn.textContent = cell.getValue();
@@ -157,15 +206,14 @@ function ScreenController() {
     if (!selectedColumn && !selectedRow) return;
 
     const dataValue = e.target.dataset.value;
-    console.log("dataValue: ", dataValue);
-
+    let playerWins = false;
     let activePlayer = game.getActivePlayer();
     if (dataValue === "X" || dataValue === "O") {
       alert("Invalid move");
     } else {
       game.playRound(selectedRow, selectedColumn);
-      game.checkWin();
-      if (game.checkWin()) {
+      game.checkWin(playerWins);
+      if (game.checkWin(playerWins) === true) {
         alert(`${activePlayer} wins!`);
       }
     }
