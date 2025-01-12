@@ -10,15 +10,14 @@ function GameBoard() {
     }
   }
 
-  console.log(board);
-
   const getBoard = () => board;
 
   const playMark = (row, column, player) => {
-    const availablePlaces = board.filter((row) => row[column].getValue() === "")
+    const availablePlaces = board.filter(
+      (row) => row[column].getValue() === ""
+    );
     console.log(availablePlaces);
     if (!availablePlaces.length) return;
-   
 
     board[row][column].addMark(player);
   };
@@ -30,7 +29,6 @@ function GameBoard() {
 
   return { getBoard, playMark, printBoard };
 }
-
 
 function Cell() {
   let value = "";
@@ -45,18 +43,16 @@ function Cell() {
 }
 
 function GameController() {
-
   const players = [
-    playerOne = {
+    (playerOne = {
       name: "Player 1",
       marker: "X",
-    },
-    playerTwo = {
+    }),
+    (playerTwo = {
       name: "Player 2",
       marker: "O",
-    },
+    }),
   ];
-  console.log(players);
 
   const board = GameBoard();
 
@@ -69,11 +65,16 @@ function GameController() {
   const getActivePlayer = () => currentPlayer;
 
   const playRound = (row, column) => {
-    console.log(`Putting ${getActivePlayer().name}'s mark in row ${row} and column ${column}.`);
+    console.log(
+      `Putting ${
+        getActivePlayer().name
+      }'s mark in row ${row} and column ${column}.`
+    );
     board.playMark(row, column, getActivePlayer().marker);
 
     checkWin(board);
     printnewRound();
+    
     switchTurn();
   };
 
@@ -83,58 +84,57 @@ function GameController() {
   };
 
   const checkWin = (board) => {
-   
     board = board.getBoard();
-    for (let i = 0; i < 3; i++) {
-      const a = board[i][0];
-      const b = board[i][1];
-      const c = board[i][2];
-
-      if (a !== "" && a === b && b === c) {
-        return "Win";
+    
+    // Vertical check
+    for (let i = 0; i < board.length; i++) {
+      if (board[i][0] !== "" && board[i][0] === board[i][1] && board[i][1] === board[i][2]) {
+        console.log("Win")
       }
     }
+  };
 
-    for (let i = 0; i < 3; i++) {
-      const a = board[0][i];
-      const b = board[1][i];
-      const c = board[2][i];
-
-      if (a !== "" && a === b && b === c) {
-        return "Win";
-      }
-    }
-
-    const a = board[0][0];
-    const b = board[1][1];
-    const c = board[2][2];
-
-    if (a !== "" && a === b && b === c) {
-      return "Win";
-    }
-
-    const d = board[0][2];
-    const e = board[1][1];
-    const f = board[2][0];
-
-    if (d !== "" && d === e && d === f) {
-      return "Win";
-    }
-
-    for (let i = 0; i < 3; i++) {
-      for (let j = 0; j < 3; j++) {
-        const square = board[i][j];
-        if (square === "") {
-          return undefined;
-        }
-      }
-    }
-    return "draw";
-  }
-
-
-
-  return { getActivePlayer, playRound, checkWin };
+  return { getActivePlayer, playRound, checkWin, getBoard: board.getBoard };
 }
 
-const game = GameController();
+function ScreenController() {
+  const game = GameController();
+  const boardDiv = document.querySelector("#gameContainer");
+  const playerTurnDiv = document.querySelector("#playerTurn");
+  const restartBtn = document.querySelector("#restart");
+
+  const updateScreen = () => {
+    boardDiv.textContent = "";
+    const board = game.getBoard();
+    const activePlayer = game.getActivePlayer();
+
+    playerTurnDiv.textContent = `${activePlayer.name}'s turn...`;
+
+    board.forEach((row, i) => {
+      row.forEach((cell, index) => {
+        const cellBtn = document.createElement("button");
+        cellBtn.classList.add("cell");
+        cellBtn.dataset.row = i;
+        cellBtn.dataset.column = index;
+        cellBtn.textContent = cell.getValue();
+        boardDiv.appendChild(cellBtn);
+      });
+    });
+  };
+
+  function clickBoard(e){
+    const selectedRow = e.target.dataset.row;
+    const selectedColumn = e.target.dataset.column;
+    if (!selectedColumn && !selectedRow) return;
+
+    game.playRound(selectedRow, selectedColumn);
+    updateScreen();
+  }
+  boardDiv.addEventListener("click", clickBoard);
+
+  updateScreen();
+
+  
+}
+
+ScreenController();
