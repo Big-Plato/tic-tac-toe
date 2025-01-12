@@ -69,18 +69,19 @@ function GameController() {
     console.log(`${getActivePlayer().name}'s turn...`);
   };
 
+    
+
+  const playRound = (row, column) => {
     let boardCells = board.getBoard();
     const boardI = boardCells.map((row) => row.map((cell) => cell.getValue()));
     console.table(boardI);
-
-  const playRound = (row, column) => {
     console.log(
       `Putting ${
         getActivePlayer().name
       }'s mark in row ${row} and column ${column}.`
     );
-    if (boardI[row][column] !== "") {
-      alert("Invalid move, \nPlay again")
+    if (boardI[row][column].includes("X") || boardI[row][column].includes("O")) {
+      alert("Invalid move \nPlay again!")
     } else {
       board.playMark(row, column, getActivePlayer().marker);
     }
@@ -162,9 +163,6 @@ function ScreenController() {
     const selectedColumn = e.target.dataset.column;
     if (!selectedColumn && !selectedRow) return;
 
-    
-
-    
     if (e.innerHTML === "X" || e.innerHTML === "O") {
       alert("Invalid move!")
     } else {
