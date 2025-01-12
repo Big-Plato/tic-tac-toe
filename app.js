@@ -42,15 +42,30 @@ function Cell() {
   return { getValue, addMark };
 }
 
+function CreatePlayer (name, marker) {
+  this.name = name;
+  this.marker = marker;
+
+  return { name, marker }
+}
+
 function GameController() {
+
+  const playerOneName = prompt("What's your name? [Player 1]");
+  const playerOneMarker = prompt("Put your marker").toUpperCase();  
+  
+  const playerTwoName = prompt("What's your name? [Player 2]");
+  const playerTwoMarker = playerOneMarker === "X" ? "O" : "X";
+  console.log(playerTwoMarker)
+
   const players = [
     (playerOne = {
-      name: "Player 1",
-      marker: "X",
+      name: playerOneName,
+      marker: playerOneMarker,
     }),
     (playerTwo = {
-      name: "Player 2",
-      marker: "O",
+      name: playerTwoName,
+      marker: playerTwoMarker,
     }),
   ];
 
@@ -87,8 +102,8 @@ function GameController() {
     }
     
 
-    checkWin(boardI);
     printnewRound();
+    checkWin();
     switchTurn();
   };
 
@@ -103,7 +118,7 @@ function GameController() {
         boardI[i][0] === boardI[i][1] &&
         boardI[i][1] === boardI[i][2]
       ) {
-        console.log("Win");
+        alert(`${getActivePlayer().name} wins!`);
         return true;
       }
     }
@@ -111,22 +126,24 @@ function GameController() {
     // Horizontal check
     for (let i = 0; i < 3; i++) {
       if (boardI[0][i] !== "" && boardI[0][i] === boardI[1][i] && boardI[1][i] === boardI[2][i]) {
-        console.log("Win");
+        alert(`${getActivePlayer().name} wins!`);
         return true;
       }
     }
 
     // Diagonal check (Upper left to Inferior right)
     if (boardI[0][0] !== "" && boardI[0][0] === boardI[1][1] && boardI [1][1] === boardI[2][2]) {
-      console.log("Win");
+      alert(`${getActivePlayer().name} wins!`);
+      return true;
     }
 
     // Diagonal check (Upper right to Inferior left)
     if (boardI[0][2] !== "" && boardI[0][2] === boardI[1][1] && boardI [1][1] === boardI[2][0]) {
-      console.log("Win");
+      alert(`${getActivePlayer().name} wins!`);
+      return true;
     }
+    return undefined;
 
-    return "draw"
   };
 
   return { getActivePlayer, playRound, checkWin, getBoard: board.getBoard };
@@ -155,24 +172,36 @@ function ScreenController() {
         boardDiv.appendChild(cellBtn);
       });
     });
-    game.checkWin(board);
+
   };
 
   function clickBoard(e) {
     const selectedRow = e.target.dataset.row;
     const selectedColumn = e.target.dataset.column;
     if (!selectedColumn && !selectedRow) return;
-
-    if (e.innerHTML === "X" || e.innerHTML === "O") {
-      alert("Invalid move!")
+    
+    if (game.checkWin() === true) {
+      return `The game is over ${game.getActivePlayer().name} wins!`;
     } else {
       game.playRound(selectedRow, selectedColumn);
+    
     }
+    
+    
     updateScreen();
+    
   }
+
   boardDiv.addEventListener("click", clickBoard);
 
+  
+
   updateScreen();
+  return;
+
+  
 }
+
+
 
 ScreenController();
