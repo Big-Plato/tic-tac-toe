@@ -64,34 +64,68 @@ function GameController() {
 
   const getActivePlayer = () => currentPlayer;
 
+  const printnewRound = () => {
+    board.printBoard();
+    console.log(`${getActivePlayer().name}'s turn...`);
+  };
+
+    let boardCells = board.getBoard();
+    const boardI = boardCells.map((row) => row.map((cell) => cell.getValue()));
+    console.table(boardI);
+
   const playRound = (row, column) => {
     console.log(
       `Putting ${
         getActivePlayer().name
       }'s mark in row ${row} and column ${column}.`
     );
-    board.playMark(row, column, getActivePlayer().marker);
-
-    checkWin(board);
-    printnewRound();
+    if (boardI[row][column] !== "") {
+      alert("Invalid move, \nPlay again")
+    } else {
+      board.playMark(row, column, getActivePlayer().marker);
+    }
     
+
+    checkWin(boardI);
+    printnewRound();
     switchTurn();
   };
 
-  const printnewRound = () => {
-    board.printBoard();
-    console.log(`${getActivePlayer().name}'s turn...`);
-  };
-
-  const checkWin = (board) => {
-    board = board.getBoard();
-    
+  const checkWin = () => {
+    let boardCells = board.getBoard();
+    const boardI = boardCells.map((row) => row.map((cell) => cell.getValue()));
+    console.table(boardI);
     // Vertical check
-    for (let i = 0; i < board.length; i++) {
-      if (board[i][0] !== "" && board[i][0] === board[i][1] && board[i][1] === board[i][2]) {
-        console.log("Win")
+    for (let i = 0; i < 3; i++) {
+      if (
+        boardI[i][0] !== "" &&
+        boardI[i][0] === boardI[i][1] &&
+        boardI[i][1] === boardI[i][2]
+      ) {
+        console.log("Win");
+        return true;
       }
     }
+
+    // Horizontal check
+    for (let i = 0; i < 3; i++) {
+      if (boardI[0][i] !== "" && boardI[0][i] === boardI[1][i] && boardI[1][i] === boardI[2][i]) {
+        console.log("Win");
+        return true;
+      }
+    }
+
+    // Diagonal check (Upper left to Inferior right)
+    if (boardI[0][0] !== "" && boardI[0][0] === boardI[1][1] && boardI [1][1] === boardI[2][2]) {
+      console.log("Win");
+    }
+
+    // Diagonal check (Upper right to Inferior left)
+    if (boardI[0][2] !== "" && boardI[0][2] === boardI[1][1] && boardI [1][1] === boardI[2][0]) {
+      console.log("Win");
+    }
+
+    return "draw"
   };
 
   return { getActivePlayer, playRound, checkWin, getBoard: board.getBoard };
@@ -120,21 +154,27 @@ function ScreenController() {
         boardDiv.appendChild(cellBtn);
       });
     });
+    game.checkWin(board);
   };
 
-  function clickBoard(e){
+  function clickBoard(e) {
     const selectedRow = e.target.dataset.row;
     const selectedColumn = e.target.dataset.column;
     if (!selectedColumn && !selectedRow) return;
 
-    game.playRound(selectedRow, selectedColumn);
+    
+
+    
+    if (e.innerHTML === "X" || e.innerHTML === "O") {
+      alert("Invalid move!")
+    } else {
+      game.playRound(selectedRow, selectedColumn);
+    }
     updateScreen();
   }
   boardDiv.addEventListener("click", clickBoard);
 
   updateScreen();
-
-  
 }
 
 ScreenController();
