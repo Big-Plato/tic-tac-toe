@@ -104,7 +104,12 @@ function GameController() {
 
     printnewRound();
     checkWin();
-    switchTurn();
+    if (checkWin() === true) {
+      return;
+    } else {
+      switchTurn();
+    }
+    
   };
 
   const checkWin = () => {
@@ -153,7 +158,7 @@ function ScreenController() {
   const game = GameController();
   const boardDiv = document.querySelector("#gameContainer");
   const playerTurnDiv = document.querySelector("#playerTurn");
-  const restartBtn = document.querySelector("#restart");
+  
 
   const updateScreen = () => {
     boardDiv.textContent = "";
@@ -181,7 +186,7 @@ function ScreenController() {
     if (!selectedColumn && !selectedRow) return;
     
     if (game.checkWin() === true) {
-      return `The game is over ${game.getActivePlayer().name} wins!`;
+      playerTurnDiv.textContent = `The game is over ${game.getActivePlayer().name} wins!`;
     } else {
       game.playRound(selectedRow, selectedColumn);
     
@@ -205,3 +210,8 @@ function ScreenController() {
 
 
 ScreenController();
+
+
+// const restartBtn = document.querySelector("#restart");
+
+// restartBtn.addEventListener("click", ScreenController());
